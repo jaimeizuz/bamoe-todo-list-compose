@@ -1,0 +1,8 @@
+{
+  "services" : [ {
+    "id" : "k9nzr",
+    "name" : "Dummy API",
+    "port" : 9002,
+    "rootDir" : "dummy-api"
+  } ]
+}

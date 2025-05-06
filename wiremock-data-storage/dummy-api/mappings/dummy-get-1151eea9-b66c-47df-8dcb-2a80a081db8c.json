@@ -1,0 +1,25 @@
+{
+  "id" : "1151eea9-b66c-47df-8dcb-2a80a081db8c",
+  "name" : "Dummy get",
+  "request" : {
+    "url" : "/dummy",
+    "method" : "GET",
+    "headers" : {
+      "Accept" : {
+        "contains" : "json"
+      }
+    }
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"message\" : \"Hello, world\"\n}",
+    "headers" : {
+      "Content-Type" : "application/json"
+    }
+  },
+  "uuid" : "1151eea9-b66c-47df-8dcb-2a80a081db8c",
+  "persistent" : true,
+  "priority" : 5,
+  "insertionIndex" : 0,
+  "postServeActions" : [ ]
+}

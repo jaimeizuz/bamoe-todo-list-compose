@@ -1,0 +1,28 @@
+apiVersion: 1
+datasources:
+- name: Kogito App Examples - Metrics (Prometheus)
+  type: prometheus
+  url: http://prometheus:9090
+  isDefault: true
+  access: proxy
+  editable: true
+- name: Kogito App Example - Logs (Loki)
+  type: loki
+  access: proxy
+  url: http://loki:3100
+  editable: true
+- name: Kogito App Example - Logs (Elasticsearch)
+  type: elasticsearch
+  access: proxy
+  url: http://elasticsearch:9200
+  editable: true
+- name: Kogito App Examples - Traces (Jaeger)
+  type: jaeger
+  access: proxy
+  url: http://jaeger:16686
+  editable: true
+- name: Kogito App Examples - Traces (Tempo)
+  type: tempo
+  access: proxy
+  url: http://tempo:3200
+  editable: true

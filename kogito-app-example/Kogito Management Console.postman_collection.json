@@ -1,0 +1,509 @@
+{
+	"info": {
+		"_postman_id": "1d7d72b9-0db6-492d-b2b3-dc7f28a242d0",
+		"name": "Kogito Management Console",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28218587"
+	},
+	"item": [
+		{
+			"name": "Management Console",
+			"item": [
+				{
+					"name": "Process Definitions",
+					"item": [
+						{
+							"name": "Get Process Definitions",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"operationName\": \"getProcessDefinitions\",\r\n    \"variables\": {},\r\n    \"query\": \"query getProcessDefinitions {\\n  ProcessDefinitions {\\n    id\\n    endpoint\\n    __typename\\n  }\\n}\\n\"\r\n}"
+								},
+								"url": {
+									"raw": "{{bamoe-localhost}}/graphql",
+									"host": [
+										"{{bamoe-localhost}}"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Process Definition Nodes",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"operationName\": \"getProcessDefinitionNodes\",\r\n    \"variables\": {\r\n        \"processId\": \"{{process-definition-id}}\"\r\n    },\r\n    \"query\": \"query getProcessDefinitionNodes($processId: String) {\\n  ProcessDefinitions(where: {id: {equal: $processId}}) {\\n    nodes {\\n      id\\n      name\\n      type\\n      __typename\\n    }\\n    __typename\\n  }\\n}\\n\"\r\n}"
+								},
+								"url": {
+									"raw": "{{bamoe-localhost}}/graphql",
+									"host": [
+										"{{bamoe-localhost}}"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Start Process Instance",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"expirationTime\": \"PT300S\"\r\n}"
+								},
+								"url": {
+									"raw": "{{bamoe-localhost}}/UserTasksProcess",
+									"host": [
+										"{{bamoe-localhost}}"
+									],
+									"path": [
+										"UserTasksProcess"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Process Instances",
+					"item": [
+						{
+							"name": "User Tasks",
+							"item": [
+								{
+									"name": "Get Tasks For User",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "default"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "default"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"operationName\": \"getTasksForUser\",\r\n    \"variables\": {\r\n        \"whereArgument\": {\r\n            \"and\": [\r\n                {},\r\n                {\r\n                    \"and\": [\r\n                        {\r\n                            \"state\": {\r\n                                \"in\": [\r\n                                    \"Ready\",\r\n                                    \"Reserved\"\r\n                                ]\r\n                            }\r\n                        }\r\n                    ]\r\n                }\r\n            ]\r\n        },\r\n        \"offset\": 0,\r\n        \"limit\": 10,\r\n        \"orderBy\": {\r\n            \"lastUpdate\": \"DESC\"\r\n        }\r\n    },\r\n    \"query\": \"query getTasksForUser($whereArgument: UserTaskInstanceArgument, $offset: Int, $limit: Int, $orderBy: UserTaskInstanceOrderBy) {\\n  UserTaskInstances(where: $whereArgument, pagination: {offset: $offset, limit: $limit}, orderBy: $orderBy) {\\n    id\\n    name\\n    referenceName\\n    description\\n    priority\\n    processInstanceId\\n    processId\\n    rootProcessInstanceId\\n    rootProcessId\\n    state\\n    actualOwner\\n    adminGroups\\n    adminUsers\\n    completed\\n    started\\n    excludedUsers\\n    potentialGroups\\n    potentialUsers\\n    inputs\\n    outputs\\n    lastUpdate\\n    endpoint\\n    externalReferenceId\\n    __typename\\n  }\\n}\\n\"\r\n}"
+										},
+										"url": {
+											"raw": "{{bamoe-localhost}}/graphql",
+											"host": [
+												"{{bamoe-localhost}}"
+											],
+											"path": [
+												"graphql"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Get Process Instances",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"process-instance-id\", pm.response.json().data.ProcessInstances[0].id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"operationName\": \"getProcessInstances\",\r\n    \"variables\": {\r\n        \"where\": {\r\n            \"parentProcessInstanceId\": {\r\n                \"isNull\": true\r\n            },\r\n            \"state\": {\r\n                \"in\": [\r\n                    \"ACTIVE\"\r\n                ]\r\n            }\r\n        },\r\n        \"offset\": 0,\r\n        \"limit\": 10,\r\n        \"orderBy\": {\r\n            \"lastUpdate\": \"DESC\"\r\n        }\r\n    },\r\n    \"query\": \"query getProcessInstances($where: ProcessInstanceArgument, $offset: Int, $limit: Int, $orderBy: ProcessInstanceOrderBy) {\\n  ProcessInstances(where: $where, pagination: {offset: $offset, limit: $limit}, orderBy: $orderBy) {\\n    id\\n    processId\\n    processName\\n    parentProcessInstanceId\\n    rootProcessInstanceId\\n    roles\\n    state\\n    start\\n    lastUpdate\\n    addons\\n    businessKey\\n    serviceUrl\\n    error {\\n      nodeDefinitionId\\n      message\\n      __typename\\n    }\\n    __typename\\n  }\\n}\\n\"\r\n}"
+								},
+								"url": {
+									"raw": "{{bamoe-localhost}}/graphql",
+									"host": [
+										"{{bamoe-localhost}}"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Process Instance Info",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"operationName\": \"getProcessInstanceById\",\r\n    \"variables\": {\r\n        \"id\": \"{{process-instance-id}}\"\r\n    },\r\n    \"query\": \"query getProcessInstanceById($id: String) {\\n  ProcessInstances(where: {id: {equal: $id}}) {\\n    id\\n    processId\\n    processName\\n    businessKey\\n    parentProcessInstanceId\\n    parentProcessInstance {\\n      id\\n      processName\\n      businessKey\\n      __typename\\n    }\\n    roles\\n    variables\\n    state\\n    start\\n    lastUpdate\\n    end\\n    addons\\n    endpoint\\n    addons\\n    serviceUrl\\n    source\\n    error {\\n      nodeDefinitionId\\n      message\\n      __typename\\n    }\\n    childProcessInstances {\\n      id\\n      processName\\n      businessKey\\n      __typename\\n    }\\n    nodes {\\n      id\\n      nodeId\\n      name\\n      enter\\n      exit\\n      type\\n      definitionId\\n      __typename\\n    }\\n    milestones {\\n      id\\n      name\\n      status\\n      __typename\\n    }\\n    __typename\\n  }\\n}\\n\"\r\n}"
+								},
+								"url": {
+									"raw": "{{bamoe-localhost}}/graphql",
+									"host": [
+										"{{bamoe-localhost}}"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Process Instance Image",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var template = \"<img src='data:image/svg+xml;base64,{{response}}' />\";\r",
+											"\r",
+											"// Set visualizer\r",
+											"pm.visualizer.set(template, {\r",
+											"    // Pass the response body parsed as JSON as `data`\r",
+											"    response: \r",
+											"       btoa(pm.response.json().data.ProcessInstances[0].diagram\r",
+											"            //.replaceAll(\"\\\\\\\"\", \"\\\"\")\r",
+											"            .replaceAll(\"xmlns=\\\"\\\"\", \"\")\r",
+											"            .replaceAll(\"<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?>\", \"\"))\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "image/svg+xml",
+										"type": "default"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"operationName\": \"getProcessInstanceSVG\",\r\n    \"variables\": {\r\n        \"processId\": \"{{process-instance-id}}\"\r\n    },\r\n    \"query\": \"query getProcessInstanceSVG($processId: String) {\\n  ProcessInstances(where: {id: {equal: $processId}}) {\\n    diagram\\n  }\\n}\\n\"\r\n}"
+								},
+								"url": {
+									"raw": "{{bamoe-localhost}}/graphql",
+									"host": [
+										"{{bamoe-localhost}}"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Jobs",
+					"item": [
+						{
+							"name": "Get Jobs by Filters",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"job-id\", pm.response.json().data.Jobs[0].id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"operationName\": \"getJobsWithFilters\",\r\n    \"variables\": {\r\n        \"values\": [\r\n            \"SCHEDULED\"\r\n        ],\r\n        \"offset\": 0,\r\n        \"limit\": 10,\r\n        \"orderBy\": {\r\n            \"lastUpdate\": \"DESC\"\r\n        }\r\n    },\r\n    \"query\": \"query getJobsWithFilters($values: [JobStatus], $orderBy: JobOrderBy, $offset: Int, $limit: Int) {\\n  Jobs(where: {status: {in: $values}}, orderBy: $orderBy, pagination: {offset: $offset, limit: $limit}) {\\n    id\\n    processId\\n    processInstanceId\\n    rootProcessId\\n    status\\n    expirationTime\\n    priority\\n    callbackEndpoint\\n    repeatInterval\\n    repeatLimit\\n    scheduledId\\n    retries\\n    lastUpdate\\n    endpoint\\n    executionCounter\\n    __typename\\n  }\\n}\\n\"\r\n}"
+								},
+								"url": {
+									"raw": "{{bamoe-localhost}}/graphql",
+									"host": [
+										"{{bamoe-localhost}}"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Jobs by Process Instance Id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"job-id\", pm.response.json().data.Jobs[0].id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"operationName\": \"getJobsByProcessInstanceId\",\r\n    \"variables\": {\r\n        \"processInstanceId\": \"{{process-instance-id}}\"\r\n    },\r\n    \"query\": \"query getJobsByProcessInstanceId($processInstanceId: String) {\\n  Jobs(where: {processInstanceId: {equal: $processInstanceId}}) {\\n    id\\n    processId\\n    processInstanceId\\n    rootProcessId\\n    status\\n    expirationTime\\n    priority\\n    callbackEndpoint\\n    repeatInterval\\n    repeatLimit\\n    scheduledId\\n    retries\\n    lastUpdate\\n    endpoint\\n    nodeInstanceId\\n    executionCounter\\n    __typename\\n  }\\n}\\n\"\r\n}"
+								},
+								"url": {
+									"raw": "{{bamoe-localhost}}/graphql",
+									"host": [
+										"{{bamoe-localhost}}"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Reschedule Job",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"operationName\": \"handleJobReschedule\",\r\n    \"variables\": {\r\n        \"jobId\": \"{{job-id}}\",\r\n        \"data\": \"{\\\"expirationTime\\\":\\\"2025-02-13T16:17:00.000Z\\\",\\\"repeatInterval\\\":0,\\\"repeatLimit\\\":0}\"\r\n    },\r\n    \"query\": \"mutation handleJobReschedule($jobId: String, $data: String) {\\n  JobReschedule(id: $jobId, data: $data)\\n}\\n\"\r\n}"
+								},
+								"url": {
+									"raw": "{{bamoe-localhost}}/graphql",
+									"host": [
+										"{{bamoe-localhost}}"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cancel Job",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "default"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"operationName\": \"jobCancel\",\r\n    \"variables\": {\r\n        \"jobId\": \"{{job-id}}\"\r\n    },\r\n    \"query\": \"mutation jobCancel($jobId: String) {\\n  JobCancel(id: $jobId)\\n}\\n\"\r\n}"
+								},
+								"url": {
+									"raw": "{{bamoe-localhost}}/graphql",
+									"host": [
+										"{{bamoe-localhost}}"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "bamoe-localhost",
+			"value": "http://localhost:8080",
+			"type": "default"
+		},
+		{
+			"key": "baseUrl",
+			"value": "{{bamoe-localhost}}",
+			"type": "default"
+		},
+		{
+			"key": "process-definition-id",
+			"value": "UserTasksProcess",
+			"type": "default"
+		},
+		{
+			"key": "process-instance-id",
+			"value": {
+				"id": "04e6c7ee-b608-4846-a6a3-242a8b065393",
+				"processId": "UserTasksProcess",
+				"processName": "UserTasksProcess",
+				"parentProcessInstanceId": null,
+				"rootProcessInstanceId": null,
+				"roles": [],
+				"state": "ACTIVE",
+				"start": "2025-02-13T15:03:12.074Z",
+				"lastUpdate": "2025-02-13T15:03:12.074Z",
+				"addons": [
+					"jdbc-persistence",
+					"process-management",
+					"source-files",
+					"process-svg",
+					"jobs-management"
+				],
+				"businessKey": null,
+				"serviceUrl": "http://localhost:8080",
+				"error": null,
+				"__typename": "ProcessInstance"
+			},
+			"type": "default"
+		},
+		{
+			"key": "job-id",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
