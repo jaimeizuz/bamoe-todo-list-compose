@@ -349,8 +349,8 @@ services:
   todolist-postgres-kogito:
     container_name: todolist-postgres-kogito
     image: 'postgres:16.8-alpine3.21'
-    cpus: 1.5
-    mem_limit: 500m
+    cpus: 3
+    mem_limit: 1024m
     profiles:
       - todolist-pgsql
       - todolist-kafka
