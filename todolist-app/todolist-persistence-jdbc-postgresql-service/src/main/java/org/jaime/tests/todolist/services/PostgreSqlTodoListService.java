@@ -30,30 +30,49 @@ public class PostgreSqlTodoListService implements TodoListService {
     @Inject
     @DataSource("todolist")
     AgroalDataSource dataSource;
-    
+
     @Override
     @Transactional(value = TxType.REQUIRED)
     public UserTask findUserTaskById(String userTaskId) {
-        try (Connection connection = dataSource.getConnection();
-                PreparedStatement statement = connection.prepareStatement(getUserTaskById)) {
-            statement.setString(1, userTaskId);
-            
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return new UserTask(
-                        resultSet.getString(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3),
-                        resultSet.getString(4),
-                        resultSet.getString(5),
-                        ((PGobject)resultSet.getObject(6)).getValue()
-                        );
+        
+        UserTask userTask = new UserTask();
+
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+
+        try {
+            connection = dataSource.getConnection();
+
+            try {
+                statement = connection.prepareStatement(getUserTaskById);
+                statement.setString(1, userTaskId);
+                try {
+                    resultSet = statement.executeQuery();
+                    try {
+                        if(resultSet.next()) {
+                            userTask = new UserTask(
+                                    resultSet.getString(1),
+                                    resultSet.getString(2),
+                                    resultSet.getString(3),
+                                    resultSet.getString(4),
+                                    resultSet.getString(5),
+                                    ((PGobject) resultSet.getObject(6)).getValue());
+                        }
+                    } finally {
+                        resultSet.close();
+                    }
+                } finally {
+                    statement.close();
                 }
+            } finally {
+                connection.close();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
         }
-        return new UserTask();
+
+        return userTask;
     }
 
     @Override
@@ -62,25 +81,42 @@ public class PostgreSqlTodoListService implements TodoListService {
 
         UserTasks userTasksList = new UserTasks();
 
-        try (Connection connection = dataSource.getConnection();
-                PreparedStatement statement = connection.prepareStatement(findUserTasksByInput.replace("param", inputName))) {
-            statement.setString(1, inputValue);
-            
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while(resultSet.next()) {
-                    userTasksList.addUserTask(
-                        new UserTask(
-                            resultSet.getString(1),
-                            resultSet.getString(2),
-                            resultSet.getString(3),
-                            resultSet.getString(4),
-                            resultSet.getString(5),
-                            ((PGobject)resultSet.getObject(6)).getValue()
-                        ));
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+
+        try {
+            connection = dataSource.getConnection();
+
+            try {
+                statement = connection.prepareStatement(findUserTasksByInput.replace("param", inputName));
+                statement.setString(1, inputValue);
+
+                try {
+                    resultSet = statement.executeQuery();
+                    try {
+                        while(resultSet.next()) {
+                            userTasksList.addUserTask(
+                                new UserTask(
+                                    resultSet.getString(1),
+                                    resultSet.getString(2),
+                                    resultSet.getString(3),
+                                    resultSet.getString(4),
+                                    resultSet.getString(5),
+                                    ((PGobject)resultSet.getObject(6)).getValue()
+                                ));
+                        }
+                    } finally {
+                        resultSet.close();
+                    }
+                } finally {
+                    statement.close();
                 }
+            } finally {
+                connection.close();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
         }
 
         return userTasksList;
@@ -92,105 +128,167 @@ public class PostgreSqlTodoListService implements TodoListService {
 
         UserTasks userTasksList = new UserTasks();
 
-        try (Connection connection = dataSource.getConnection();
-                PreparedStatement statement = connection.prepareStatement(findUserTasksByActualOwnerAndInput.replace("param", inputName))) {
-            statement.setString(1, userId);
-            statement.setString(2, inputValue);
-            
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    userTasksList.addUserTask(
-                        new UserTask(
-                            resultSet.getString(1),
-                            resultSet.getString(2),
-                            resultSet.getString(3),
-                            resultSet.getString(4),
-                            resultSet.getString(5),
-                            ((PGobject)resultSet.getObject(6)).getValue()
-                    ));
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+
+        try {
+            connection = dataSource.getConnection();
+
+            try {
+                statement = connection.prepareStatement(findUserTasksByActualOwnerAndInput.replace("param", inputName));
+                statement.setString(1, userId);
+                statement.setString(2, inputValue);
+
+                try {
+                    resultSet = statement.executeQuery();
+                    try {
+                        while(resultSet.next()) {
+                            userTasksList.addUserTask(
+                                new UserTask(
+                                    resultSet.getString(1),
+                                    resultSet.getString(2),
+                                    resultSet.getString(3),
+                                    resultSet.getString(4),
+                                    resultSet.getString(5),
+                                    ((PGobject)resultSet.getObject(6)).getValue()
+                                ));
+                        }
+                    } finally {
+                        resultSet.close();
+                    }
+                } finally {
+                    statement.close();
                 }
+            } finally {
+                connection.close();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
         }
+
         return userTasksList;
     }
 
     @Override
     @Transactional(value = TxType.REQUIRED)
     public UserTasks findUserTasksByActualOwner(String userId) {
-
         UserTasks userTasksList = new UserTasks();
 
-        try (Connection connection = dataSource.getConnection();
-                PreparedStatement statement = connection.prepareStatement(findUserTasksByActualOwner)) {
-            statement.setString(1, userId);
-            
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while(resultSet.next()) {
-                    userTasksList.addUserTask(
-                        new UserTask(
-                            resultSet.getString(1),
-                            resultSet.getString(2),
-                            resultSet.getString(3),
-                            resultSet.getString(4),
-                            resultSet.getString(5),
-                            ((PGobject)resultSet.getObject(6)).getValue()
-                    ));
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+
+        try {
+            connection = dataSource.getConnection();
+
+            try {
+                statement = connection.prepareStatement(findUserTasksByActualOwner);
+                statement.setString(1, userId);
+
+                try {
+                    resultSet = statement.executeQuery();
+                    try {
+                        while(resultSet.next()) {
+                            userTasksList.addUserTask(
+                                new UserTask(
+                                    resultSet.getString(1),
+                                    resultSet.getString(2),
+                                    resultSet.getString(3),
+                                    resultSet.getString(4),
+                                    resultSet.getString(5),
+                                    ((PGobject)resultSet.getObject(6)).getValue()
+                                ));
+                        }
+                    } finally {
+                        resultSet.close();
+                    }
+                } finally {
+                    statement.close();
                 }
+            } finally {
+                connection.close();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
         }
+
         return userTasksList;
     }
 
     @Override
     @Transactional(value = TxType.REQUIRED)
     public Boolean createUserTask(UserTask userTask) {
-        try (Connection connection = dataSource.getConnection();
-                PreparedStatement statement = connection.prepareStatement(insertNewUserTask)) {
-            statement.setString(1, userTask.getId());
-            statement.setString(2, userTask.getProcessInstanceId());
-            statement.setString(3, userTask.getProcessDefinitionId());
-            statement.setString(4, userTask.getName());
-            statement.setString(5, userTask.getActualOwner());
 
-            // Opt 1: OTHER type
-            statement.setObject(6, userTask.getInputs(), java.sql.Types.OTHER);
+        Connection connection = null;
+        PreparedStatement statement = null;
 
-            // Opt 2: Custom PGObject
-            /*
-            PGobject jsonObject = new PGobject();
-            jsonObject.setType("json");
-            jsonObject.setValue(userTask.getInputs());
-            statement.setObject(6, jsonObject);
-             */
+        int result = 0;
 
-             int result = statement.executeUpdate();
-             
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        try {
+            connection = dataSource.getConnection();
+
+            try {
+                statement = connection.prepareStatement(insertNewUserTask);
+                statement.setString(1, userTask.getId());
+                statement.setString(2, userTask.getProcessInstanceId());
+                statement.setString(3, userTask.getProcessDefinitionId());
+                statement.setString(4, userTask.getName());
+                statement.setString(5, userTask.getActualOwner());
+
+                // Opt 1: OTHER type
+                statement.setObject(6, userTask.getInputs(), java.sql.Types.OTHER);
+
+                // Opt 2: Custom PGObject
+                /*
+                * PGobject jsonObject = new PGobject();
+                * jsonObject.setType("json");
+                * jsonObject.setValue(userTask.getInputs());
+                * statement.setObject(6, jsonObject);
+                */
+
+                try {
+                    result = statement.executeUpdate();
+                } finally {
+                    statement.close();
+                }
+            } finally {
+                connection.close();
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
         }
-        return false;
+
+        return (result == 1 ? true : false);
     }
 
     @Override
     @Transactional(value = TxType.REQUIRED)
     public Boolean deleteUserTask(String id) {
-        try (Connection connection = dataSource.getConnection();
-                PreparedStatement statement = connection.prepareStatement(deleteUserTask)) {
-            
-            statement.setString(1, id);
+        Connection connection = null;
+        PreparedStatement statement = null;
 
-             int result = statement.executeUpdate();
-             if(result > 0) {
-                return true;
-             }
-        } catch (SQLException e) {
-           throw new RuntimeException(e);
+        int result = 0;
+
+        try {
+            connection = dataSource.getConnection();
+
+            try {
+                statement = connection.prepareStatement(deleteUserTask);
+                statement.setString(1, id);
+
+                try {
+                    result = statement.executeUpdate();
+                } finally {
+                    statement.close();
+                }
+            } finally {
+                connection.close();
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
         }
 
-        return false;
+        return (result > 0 ? true : false);
     }
 }

@@ -7,8 +7,6 @@ public interface TodoListService {
 
     public UserTask findUserTaskById(String userTaskId);
 
-    public UserTask findUserTaskByProcessInstanceId(String userTaskId);
-
     public UserTasks findUserTasksByInputValue(String inputName, String inputValue);
 
     public UserTasks findUserTasksByActualOwnerAndInputValue(String userId, String inputName, String inputValue);

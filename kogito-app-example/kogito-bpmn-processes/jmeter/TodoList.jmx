@@ -42,7 +42,7 @@
         <collectionProp name="Arguments.arguments">
           <elementProp name="kogito-app-host" elementType="Argument">
             <stringProp name="Argument.name">kogito-app-host</stringProp>
-            <stringProp name="Argument.value">localhost</stringProp>
+            <stringProp name="Argument.value">192.168.8.200</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="kogito-app-port" elementType="Argument">
@@ -57,12 +57,12 @@
           </elementProp>
           <elementProp name="iterationsNr" elementType="Argument">
             <stringProp name="Argument.name">iterationsNr</stringProp>
-            <stringProp name="Argument.value">1200</stringProp>
+            <stringProp name="Argument.value">300</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="usersNr" elementType="Argument">
             <stringProp name="Argument.name">usersNr</stringProp>
-            <stringProp name="Argument.value">200</stringProp>
+            <stringProp name="Argument.value">100</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="rampUp" elementType="Argument">
@@ -72,7 +72,7 @@
           </elementProp>
           <elementProp name="todolist-app-host" elementType="Argument">
             <stringProp name="Argument.name">todolist-app-host</stringProp>
-            <stringProp name="Argument.value">localhost</stringProp>
+            <stringProp name="Argument.value">192.168.8.200</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="todolist-app-port" elementType="Argument">
@@ -87,7 +87,7 @@
           </elementProp>
           <elementProp name="waitTime" elementType="Argument">
             <stringProp name="Argument.name">waitTime</stringProp>
-            <stringProp name="Argument.value">450</stringProp>
+            <stringProp name="Argument.value">350</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
