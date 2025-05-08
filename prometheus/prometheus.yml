@@ -8,7 +8,7 @@ scrape_configs:
     metrics_path: /metrics
     scrape_interval: 5s
     static_configs:
-    - targets: ['opentelemetry-collector:8889']
+    - targets: ['todolist-opentelemetry-collector:8889']
 
   #- job_name: 'kogito-app-example-prometheus'
   #  metrics_path: '/q/metrics/prometheus'

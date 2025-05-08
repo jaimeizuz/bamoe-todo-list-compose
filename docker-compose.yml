@@ -8,11 +8,12 @@ services:
       - '8080:8080'
       - '8083:8083'
     cpus: 2
-    mem_limit: 768m
+    mem_limit: 1024m
     environment:
       KOGITO_PERSISTENCE_PROTO_MARSHALLER: "false"
       QUARKUS_HTTP_CORS_ORIGINS: /.*/
       GC_CONTAINER_OPTIONS: "-XX:+UseG1GC"
+      QUARKUS_THREAD_POOL_MAX_THREADS: 250
       # Kogito datasource
       QUARKUS_DATASOURCE_JDBC_URL: 'jdbc:postgresql://todolist-postgres-kogito:5432/kogito'
       QUARKUS_DATASOURCE_USERNAME: kogito-user
@@ -27,12 +28,18 @@ services:
       QUARKUS_DATASOURCE_TODOLIST_DB_KIND: postgresql
       QUARKUS_DATASOURCE_TODOLIST_JDBC_ENABLE_METRICS: "true"
       QUARKUS_DATASOURCE_TODOLIST_JDBC_METRICS_ENABLED: "true"
+      QUARKUS_DATASOURCE_TODOLIST_JDBC__INITIAL_SIZE: 20
+      QUARKUS_DATASOURCE_TODOLIST_JDBC_MIN_SIZE: 20
+      QUARKUS_DATASOURCE_TODOLIST_JDBC_MAX_SIZE: 60
       # XA transaction objects datasource
       QUARKUS_DATASOURCE__XOS__JDBC_URL: 'jdbc:postgresql://todolist-postgres-kogito:5432/xa-object-store'
       QUARKUS_DATASOURCE__XOS__USERNAME: kogito-user
       QUARKUS_DATASOURCE__XOS__PASSWORD: kogito-pass
       QUARKUS_DATASOURCE__XOS__DB_KIND: postgresql
       QUARKUS.DATASOURCE__XOS__JDBC_TRANSACTIONS: disabled
+      QUARKUS_DATASOURCE__XOS__JDBC__INITIAL_SIZE: 20
+      QUARKUS_DATASOURCE__XOS__JDBC_MIN_SIZE: 20
+      QUARKUS_DATASOURCE__XOS__JDBC_MAX_SIZE: 60
       # The initial size of the pool. Usually you will want to set the initial size to match at least the minimal size, 
       # but this is not enforced so to allow for architectures which prefer a lazy initialization of the connections on boot, 
       # while being able to sustain a minimal pool size after boot. DEFAULT: null
@@ -40,7 +47,7 @@ services:
       # The datasource pool minimum size. DEFAULT: 0
       QUARKUS_DATASOURCE_JDBC_MIN_SIZE: 20
       # The datasource pool maximum size. DEFAULT: 20
-      QUARKUS_DATASOURCE_JDBC_MAX_SIZE: 40
+      QUARKUS_DATASOURCE_JDBC_MAX_SIZE: 60 
       # The interval at which we validate idle connections in the background. Set to 0 to disable background validation. DEFAULT: 2M
       # QUARKUS_DATASOURCE_JDBC_BACKGROUND_VALIDATION_INTERVAL: 2M
       # Perform foreground validation on connections that have been idle for longer than the specified interval. DEFAULT: null
@@ -59,7 +66,7 @@ services:
       QUARKUS_TRANSACTION-MANAGER_OBJECT-STORE_DATASOURCE: "xos"
       QUARKUS_TRANSACTION-MANAGER_OBJECT-STORE_TYPE: "jdbc"
       QUARKUS_TRANSACTION-MANAGER_OBJECT-STORE_CREATE-TABLE: "true"
-      KOGITO_SERVICE_URL: 'http://todolist-kogito-app-service-pgsql-1:8080'
+      KOGITO_SERVICE_URL: 'http://localhost:8080'
       KOGITO_DATA_INDEX_URL: 'http://localhost:8080'
       KOGITO_JOBS_SERVICE_URL: 'http://localhost:8080'
       # The current chunk size in minutes the scheduler handles, it is used to keep a limit number of jobs scheduled
@@ -80,7 +87,6 @@ services:
       QUARKUS_OTEL_LOGS_ENABLED: "true"
       QUARKUS_OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://todolist-opentelemetry-collector:4317
       QUARKUS_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://todolist-opentelemetry-collector:4317
-      #QUARKUS_MICROMETER_EXPORT_OTLP_URL: http://opentelemetry-collector:4318
       QUARKUS_DATASOURCE_JDBC_TELEMETRY: "true"
       QUARKUS_DATASOURCE_JDBC_TELEMETRY_ENABLED: "true"
       QUARKUS_DATASOURCE_JDBC_TRACING: "true"
@@ -183,7 +189,7 @@ services:
       todolist-redpanda:
         condition: service_healthy
       todolist-elasticsearch:
-        condition: service_started
+        condition: service_healthy
   todolist-kogito-app-service-elastic-1:
     container_name: todolist-kogito-app-service-elastic-1
     image: jizuzquiza/kogito-bpmn-processes:1.0.0-SNAPSHOT-elastic
@@ -270,7 +276,7 @@ services:
       todolist-postgres-kogito:
         condition: service_started
       todolist-elasticsearch:
-        condition: service_started
+        condition: service_healthy
   todolist-rest-service-pgqsql:
     container_name: todolist-rest-service-pgsql
     image: jizuzquiza/todolist-rest-service:1.0.0-SNAPSHOT-pgsql
@@ -309,7 +315,7 @@ services:
       QUARKUS_HTTP_CORS_ORIGINS: /.*/
     depends_on:
       todolist-elasticsearch:
-        condition: service_started
+        condition: service_healthy
   todolist-kafka-processor-service:
     container_name: todolist-kafka-processor-service
     image: jizuzquiza/todolist-kafka-processor-service:1.0.0-SNAPSHOT
@@ -327,7 +333,7 @@ services:
       MP_MESSAGING_INCOMING_TODOLIST_CONNECTOR: smallrye-kafka
     depends_on:
       todolist-elasticsearch:
-        condition: service_started
+        condition: service_healthy
       todolist-redpanda:
         condition: service_healthy
   todolist-kogito-management-console:
@@ -349,8 +355,8 @@ services:
   todolist-postgres-kogito:
     container_name: todolist-postgres-kogito
     image: 'postgres:16.8-alpine3.21'
-    cpus: 3
-    mem_limit: 1024m
+    cpus: 2
+    mem_limit: 1536m
     profiles:
       - todolist-pgsql
       - todolist-kafka
@@ -381,7 +387,7 @@ services:
     container_name: todolist-postgres-todolist
     image: 'postgres:16.8-alpine3.21'
     cpus: 1.5
-    mem_limit: 500m
+    mem_limit: 768m
     profiles:
       - todolist-pgsql
     ports:
@@ -412,7 +418,7 @@ services:
     cpus: 1.5
     mem_limit: 500m
     profiles:
-      - dashboards
+      - grafana
     ports:
       - '5434:5432'
     volumes:
@@ -574,16 +580,17 @@ services:
       - todolist-redpanda
   todolist-jaeger:
     container_name: todolist-jaeger
-    image: jaegertracing/jaeger:2.1.0
-    cpus: 0.5
-    mem_limit: 500m
+    image: jaegertracing/jaeger:2.5.0
+    cpus: 2
+    mem_limit: 3072m
     profiles:
       - todolist-pgsql
       - todolist-kafka
       - todolist-elasticsearch
     volumes:
-      - './jaeger/jaeger-ui.json:/etc/jaeger/jaeger-ui.json'
-    #command: '--query.ui-config /etc/jaeger/jaeger-ui.json'
+      - './jaeger/jaeger-ui.json:/etc/jaeger/jaeger-ui.json:Z'
+      - './jaeger/config-elasticsearch.yaml:/etc/jaeger/config.yml:Z'
+    command: '--config /etc/jaeger/config.yml'
     environment:
       - METRICS_STORAGE_TYPE=prometheus
       - 'PROMETHEUS_SERVER_URL=http://prometheus:9090'
@@ -600,11 +607,14 @@ services:
       - 14250:14250
       - 5778:5778
       - 9411:9411
+    depends_on:
+      todolist-elasticsearch:
+        condition: service_healthy
   todolist-otel_collector:
     container_name: todolist-opentelemetry-collector
     image: otel/opentelemetry-collector-contrib:0.116.1
-    cpus: 1
-    mem_limit: 500m
+    cpus: 2
+    mem_limit: 2048m
     profiles:
       - todolist-pgsql
       - todolist-kafka
@@ -638,7 +648,7 @@ services:
     container_name: todolist-grafana
     image: grafana/grafana:11.4.0
     profiles:
-      - dashboards
+      - grafana
     volumes:
       - './grafana/grafana.ini:/etc/grafana/grafana.ini:z'
       - >-
@@ -660,19 +670,25 @@ services:
   todolist-elasticsearch:
     container_name: todolist-elasticsearch
     image: docker.io/elastic/elasticsearch:8.16.2
-    cpus: 2
-    mem_limit: 1024m
+    cpus: 3 
+    mem_limit: 2048m
     profiles:
+      - todolist-pgsql
       - todolist-kafka
       - todolist-elasticsearch
     ports:
       - "9200:9200"
       - "9300:9300"
     environment:
-      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      ES_JAVA_OPTS: "-Xms512m -Xmx1024m"
       discovery.type: "single-node"
       xpack.security.enabled: "false"
       cluster.routing.allocation.disk.threshold_enabled: "false"
+    healthcheck:
+     test: curl -s http://localhost:9200 >/dev/null || exit 1
+     interval: 20s
+     timeout: 10s
+     retries: 20
   todolist-kibana:
     container_name: todolist-kibana
     image: docker.io/elastic/kibana:8.16.2
@@ -684,7 +700,7 @@ services:
       XPACK_REPORTING_ENCRIPTIONKEY: 3739d02dd358ccb3915cbbd89a6f5150
       XPACK_SECURITY_ENCRIPTIONKEY: 5c4eaf77fdde275944bb1a876a9af87a
     profiles:
-      - dashboards
+      - kibana
     ports:
       - "5601:5601"
     depends_on:

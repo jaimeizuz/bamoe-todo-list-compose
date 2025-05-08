@@ -9,19 +9,28 @@ receivers:
   prometheus:
     config:
       scrape_configs:
-        - job_name: todolist-kogito-app-service-1
+        - job_name: todolist-kogito-app-service-pgsql-1
           metrics_path: '/q/metrics/prometheus'
           scrape_interval: 5s
           static_configs:
-            - targets: [todolist-kogito-app-service-1:8080]
-
+            - targets: [todolist-kogito-app-service-pgsql-1:8080]
+       # - job_name: todolist-kogito-app-service-kafka-1
+       #   metrics_path: '/q/metrics/prometheus'
+       #   scrape_interval: 5s
+       #   static_configs:
+       #     - targets: [todolist-kogito-app-service-kafka-1:8080]
+       # - job_name: todolist-kogito-app-service-elastic-1
+       #   metrics_path: '/q/metrics/prometheus'
+       #   scrape_interval: 5s
+       #   static_configs:
+       #     - targets: [todolist-kogito-app-service-elastic-1:8080]
 exporters:
   # OTLP
   #otlp:
     #endpoint: otelcol:4317
   # Data sources: traces
   otlp/jaeger:
-    endpoint: "todolist-jaeger:4317"
+    endpoint: "http://todolist-jaeger:4317"
     tls:
       insecure: true
   elasticsearch:
@@ -42,11 +51,15 @@ processors:
   batch:
 
 service:
+  telemetry:
+    logs:
+      level: WARN
   pipelines:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/jaeger,elasticsearch]
+      #exporters: [otlp/jaeger,elasticsearch]
+      exporters: [otlp/jaeger]
       #exporters: [spanmetrics, otlp]
     # The exporter name in this pipeline must match the spanmetrics.metrics_exporter name.
     # The receiver is just a dummy and never used; added to pass validation requiring at least one receiver in a pipeline.
@@ -56,7 +69,8 @@ service:
       exporters: [prometheus]
     logs:
       receivers: [otlp]
-      exporters: [debug,elasticsearch]
+      #exporters: [debug,elasticsearch]
+      exporters: [debug]
     #metrics/spanmetrics:
     #    receivers: [spanmetrics]
     #    exporters: [prometheus]

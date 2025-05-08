@@ -2,7 +2,7 @@ apiVersion: 1
 datasources:
 - name: Kogito App Examples - Metrics (Prometheus)
   type: prometheus
-  url: http://prometheus:9090
+  url: http://todolist-prometheus:9090
   isDefault: true
   access: proxy
   editable: true
@@ -14,12 +14,12 @@ datasources:
 - name: Kogito App Example - Logs (Elasticsearch)
   type: elasticsearch
   access: proxy
-  url: http://elasticsearch:9200
+  url: http://todolist-elasticsearch:9200
   editable: true
 - name: Kogito App Examples - Traces (Jaeger)
   type: jaeger
   access: proxy
-  url: http://jaeger:16686
+  url: http://todolist-jaeger:16686
   editable: true
 - name: Kogito App Examples - Traces (Tempo)
   type: tempo
